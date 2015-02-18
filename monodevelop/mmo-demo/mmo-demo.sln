@@ -33,7 +33,7 @@ Global
 		{82762372-C6AA-4F49-84C6-180FBF583AD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = ..\netki-runtime\netki-runtime.csproj
+		StartupItem = ..\demo-server\demo-server.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
