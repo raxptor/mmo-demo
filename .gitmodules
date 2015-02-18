@@ -1,0 +1,9 @@
+[submodule "ext/cube"]
+	path = ext/cube
+	url = https://raxptor@github.com/raxptor/cube.git
+[submodule "ext/putki"]
+	path = ext/putki
+	url = https://raxptor@github.com/raxptor/putki.git
+[submodule "ext/unity-mmo"]
+	path = ext/unity-mmo
+	url = https://raxptor@github.com/raxptor/unity-mmo.git
