@@ -8,6 +8,26 @@ namespace demoserver
 	{
         public static Random r = new Random();
 
+		public static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+
+            netki.Bitstream.Buffer buf = netki.Bitstream.Buffer.Make(new byte[1024]);
+            Bitstream.PutCompressedUint(buf, 23);
+            Bitstream.PutCompressedInt(buf, -4);
+            Bitstream.PutCompressedInt(buf, 1032);
+            Bitstream.PutCompressedInt(buf, -1024);
+            Bitstream.PutCompressedInt(buf, 42);
+            buf.Flip();
+            uint x5 = Bitstream.ReadCompressedUint(buf);
+            int x1 = Bitstream.ReadCompressedInt(buf); 
+            int x2 = Bitstream.ReadCompressedInt(buf);
+            int x3 = Bitstream.ReadCompressedInt(buf);
+            int x4 = Bitstream.ReadCompressedInt(buf);
+            Console.WriteLine("ah " + x1 + " " + x2 + " " + x3 + " " + x4 + " " + x5);
+        }
+
+        /*
         public static void InternetSimulate(List<Bitstream.Buffer> src, PacketLane lane)
         {
             if (src.Count == 0)
@@ -35,10 +55,8 @@ namespace demoserver
                src.RemoveAt(pick);
         }
 
-		public static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-
+            return;
+           
             PacketLane peer1 = new PacketLaneUnreliableOrdered();
             PacketLane peer2 = new PacketLaneUnreliableOrdered();
 
@@ -133,5 +151,6 @@ namespace demoserver
 
             Console.WriteLine("PEER1 PL=" + peer1.ComputePacketLoss() + "  PEER2 PL=" + peer2.ComputePacketLoss());
         }
+        */
     }
 }
