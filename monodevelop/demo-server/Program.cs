@@ -8,23 +8,60 @@ namespace demoserver
 	{
         public static Random r = new Random();
 
+        class LevelQuery : UnityMMO.ILevelQuery
+        {
+
+        }
+
+        class PacketHandler : Cube.ApplicationPacketHandler
+        {
+            public Bitstream.Buffer MakePacket(Packet p)
+            {
+                Bitstream.Buffer buf = Bitstream.Buffer.Make(new byte[1024]);
+                Bitstream.PutBits(buf, 16, (uint) p.type_id);
+                CubePackets.Encode(p, buf);
+                UnityMMOPackets.Encode(p, buf);
+                return buf;
+            }
+
+            public int Decode(byte[] data, int offset, int length, out DecodedPacket pkt)
+            {
+                Bitstream.Buffer buf = new Bitstream.Buffer();
+                buf.bufsize = length;
+                buf.bytepos = offset;
+                buf.buf = data;
+
+                uint type = Bitstream.ReadBits(buf, 16);
+
+                if (CubePackets.Decode(buf, (int)type, out pkt))
+                {
+                    Bitstream.SyncByte(buf);
+                    return buf.bytepos - offset;
+                }
+                if (UnityMMOPackets.Decode(buf, (int)type, out pkt))
+                {
+                    Bitstream.SyncByte(buf);
+                    return buf.bytepos - offset;
+                }
+                return 0;
+            }
+        }
+
 		public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            UnityMMO.WorldServer ws = new UnityMMO.WorldServer(new LevelQuery());
+            UnityMMO.GameInstServer gi = new UnityMMO.GameInstServer(ws, "internal", 10);
+            Cube.LocalServerClient cl = new Cube.LocalServerClient(new PacketHandler());
+            UnityMMO.WorldClient wcl = new UnityMMO.WorldClient(cl);
+            cl.Connect(gi, "spelare1");
 
-            netki.Bitstream.Buffer buf = netki.Bitstream.Buffer.Make(new byte[1024]);
-            Bitstream.PutCompressedUint(buf, 23);
-            Bitstream.PutCompressedInt(buf, -4);
-            Bitstream.PutCompressedInt(buf, 1032);
-            Bitstream.PutCompressedInt(buf, -1024);
-            Bitstream.PutCompressedInt(buf, 42);
-            buf.Flip();
-            uint x5 = Bitstream.ReadCompressedUint(buf);
-            int x1 = Bitstream.ReadCompressedInt(buf); 
-            int x2 = Bitstream.ReadCompressedInt(buf);
-            int x3 = Bitstream.ReadCompressedInt(buf);
-            int x4 = Bitstream.ReadCompressedInt(buf);
-            Console.WriteLine("ah " + x1 + " " + x2 + " " + x3 + " " + x4 + " " + x5);
+            while (true)
+            {
+                float dt = 0.10f;
+                wcl.Update(dt);
+                gi.Update(dt);
+                System.Threading.Thread.Sleep(100);
+            }
         }
 
         /*
