@@ -105,8 +105,14 @@ namespace demoserver
 
             cl.Connect(gi, "spelare1");
 
+
             while (true)
             {
+                if (wcl.GetControlledCharacter() != null)
+                {
+                    wcl.DoSpawnCharacter();
+                }
+
                 float dt = 0.01f;
                 cl.Update(dt);
                 wcl.Update(dt);
