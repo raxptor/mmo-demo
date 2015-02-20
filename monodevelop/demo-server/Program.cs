@@ -47,20 +47,70 @@ namespace demoserver
             }
         }
 
+        public class TestCharacterServer : UnityMMO.ServerCharacter
+        {
+            public TestCharacterServer(UnityMMO.ServerCharacterData data) : base(data)
+            {
+
+            }
+        }
+
+        public class TestCharacterClient : UnityMMO.WorldClient.Character
+        {
+            public TestCharacterClient()
+            {
+
+            }
+
+            public void OnEventBlock(uint iteration, Bitstream.Buffer block)
+            {
+
+            }
+
+            public void OnUpdateBlock(uint iteration, Bitstream.Buffer block)
+            {
+                uint rand = Bitstream.ReadBits(block, 32);
+                Console.WriteLine("iteration " + iteration + " has value=" + rand);
+
+            }
+
+            public void OnFullStateBlock(uint iteration, Bitstream.Buffer block)
+            {
+
+            }
+
+            public void OnFilterChange(bool filtered)
+            {
+                Console.WriteLine("Character filtered: " + filtered);
+            }
+        }
+
+
 		public static void Main(string[] args)
         {
+
             UnityMMO.WorldServer ws = new UnityMMO.WorldServer(new LevelQuery());
             UnityMMO.GameInstServer gi = new UnityMMO.GameInstServer(ws, "internal", 10);
-            Cube.LocalServerClient cl = new Cube.LocalServerClient(new PacketHandler());
+            Cube.LocalServerClient cl = new Cube.LocalServerClient(new PacketHandler(), 0.25f);
             UnityMMO.WorldClient wcl = new UnityMMO.WorldClient(cl);
+
+            for (int i = 0; i < 10; i++)
+            {
+                UnityMMO.ServerCharacterData dt = new UnityMMO.ServerCharacterData();
+                dt.Id = (uint)i;
+                dt.HumanControllable = true;
+                ws.AddCharacter(new UnityMMO.ServerCharacter(dt));
+                wcl.AddCharacter(i, new TestCharacterClient());
+            }
+
             cl.Connect(gi, "spelare1");
 
             while (true)
             {
-                float dt = 0.10f;
+                float dt = 0.01f;
+                cl.Update(dt);
                 wcl.Update(dt);
-                gi.Update(dt);
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(10);
             }
         }
 
